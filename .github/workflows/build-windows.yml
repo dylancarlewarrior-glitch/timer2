@@ -1,0 +1,37 @@
+name: 建置 Windows 執行檔
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: 取得程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安裝打包工具
+        run: python -m pip install --upgrade pip pyinstaller
+
+      - name: 打包單一 Windows 執行檔
+        run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name "老陳專注計時器" timer.py
+
+      - name: 上傳執行檔
+        uses: actions/upload-artifact@v4
+        with:
+          name: 老陳專注計時器-Windows
+          path: dist/老陳專注計時器.exe
+          if-no-files-found: error
+          retention-days: 30
